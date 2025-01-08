@@ -186,7 +186,7 @@ class UserController extends Controller
             // Lấy người dùng theo id
             $data = User::find($id);
 
-            if ($data === null) {
+            if (!$data) {
                 return response()->json([
                     "message" => "Không tìm thấy người dùng",
                     "data" => []

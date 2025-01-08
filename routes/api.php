@@ -18,7 +18,11 @@ use Illuminate\Support\Facades\Route;
 
 
 // Hiển thị danh sách người dùng
-Route::get('/users', [UserController::class, 'index']);
-Route::post('/users', [UserController::class, 'store']);
-Route::get('/users/{id}', [UserController::class, 'show']);
-Route::post('/users/{id}', [UserController::class, 'update']);
+
+Route::group(['prefix' => 'admin'], function () {
+    Route::get('/users', [UserController::class, 'index']);           // Lấy danh sách người dùng
+    Route::post('/users', [UserController::class, 'store']);          // Thêm người dùng mới
+    Route::get('/users/{id}', [UserController::class, 'show']);       // Lấy thông tin chi tiết người dùng
+    Route::post('/users/{id}', [UserController::class, 'update']);     // Cập nhật thông tin người dùng
+    Route::delete('/users/{id}', [UserController::class, 'destroy']); // Xóa người dùng
+});

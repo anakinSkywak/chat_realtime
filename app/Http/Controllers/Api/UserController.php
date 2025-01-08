@@ -117,102 +117,63 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        // // Cập nhật thông tin người dùng
-        // try {
-        //     // Validate dữ liệu đầu vào
-        //     $validated = $request->validate([
-        //         'name' => 'min:3|max:255',
-        //         'email' => 'email|unique:users,email,' . $id, // Chỉ kiểm tra uniqueness với ngoại lệ cho người dùng hiện tại
-        //         'password' => 'min:6|max:255',
-        //         'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Ảnh không bắt buộc
-        //     ]);
+        // Cập nhật thông tin người dùng
+        try {
+            // Validate dữ liệu đầu vào
+            $validated = $request->validate([
+                'name' => 'min:3|max:255',
+                'email' => 'email|unique:users,email,' . $id, // Chỉ kiểm tra uniqueness với ngoại lệ cho người dùng hiện tại
+                'password' => 'min:6|max:255',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Ảnh không bắt buộc
+            ]);
 
-        //     // Lấy người dùng theo id
-        //     $data = User::find($id);
+            // Lấy người dùng theo id
+            $data = User::find($id);
 
-        //     if ($data === null) {
-        //         return response()->json([
-        //             "message" => "Không tìm thấy người dùng",
-        //             "data" => []
-        //         ], 404);
-        //     }
-
-        //     // Xử lý file ảnh nếu có
-        //     if ($request->hasFile('image')) {
-        //         $image = $request->file('image');
-        //         $image_name = time() . '.' . $image->getClientOriginalExtension();
-        //         $image->move(public_path('images'), $image_name);
-
-        //         // Kiểm tra xem người dùng có ảnh đại diện cũ không
-        //         if (!empty($data->image) && file_exists(public_path($data->image))) {
-        //             // Xóa ảnh cũ
-        //             unlink(public_path($data->image));
-        //         }
-
-        //         // Cập nhật đường dẫn file ảnh mới vào validated
-        //         $validated['image'] = 'images/' . $image_name;
-        //     }
-
-        //     // Cập nhật thông tin người dùng 
-        //     $data->update($validated);
-
-        //     // Trả về JSON response
-        //     return response()->json([
-        //         "message" => "Cập nhật người dùng thành công",
-        //         "data" => $data
-        //     ], 200);
-        // } catch (\Illuminate\Validation\ValidationException $e) {
-        //     // Lỗi validate
-        //     return response()->json([
-        //         "message" => "Dữ liệu không hợp lệ",
-        //         "errors" => $e->errors()
-        //     ], 422);
-        // } catch (\Exception $e) {
-        //     // Lỗi khác
-        //     return response()->json([
-        //         "message" => "Cập nhật người dùng thất bại",
-        //         "error" => $e->getMessage()
-        //     ], 500);
-        // }
-
-        // Validate dữ liệu đầu vào
-        $validated = $request->validate([
-            'name' => 'min:3|max:255',
-            'email' => 'email|unique:users,email,' . $id, // Chỉ kiểm tra uniqueness với ngoại lệ cho người dùng hiện tại
-            'password' => 'min:6|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Ảnh không bắt buộc
-        ]);
-
-        // Lấy người dùng theo id
-        $data = User::find($id);
-
-        if ($data === null) {
-            return response()->json([
-                "message" => "Không tìm thấy người dùng",
-                "data" => []
-            ], 404);
-        }
-
-        // Xử lý file ảnh nếu có
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $image_name = time() . '.' . $image->getClientOriginalExtension();
-            $image->storeAs('public/images', $image_name);
-
-            // Kiểm tra xem người dùng có ảnh đại diện cũ không
-            if (!empty($data->image) && file_exists(public_path($data->image))) {
-                // Xóa ảnh cũ
-                unlink(public_path($data->image));
+            if ($data === null) {
+                return response()->json([
+                    "message" => "Không tìm thấy người dùng",
+                    "data" => []
+                ], 404);
             }
 
-            // Cập nhật đường dẫn file ảnh mới vào validated
-            $validated['image'] = 'images/' . $image_name;
+            // Xử lý file ảnh nếu có
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $image_name = time() . '.' . $image->getClientOriginalExtension();
+                $image->storeAs('public/images', $image_name);
+
+                // Kiểm tra xem người dùng có ảnh đại diện cũ không
+                if (!empty($data->image) && file_exists(public_path($data->image))) {
+                    // Xóa ảnh cũ
+                    unlink(public_path($data->image));
+                }
+
+                // Cập nhật đường dẫn file ảnh mới vào validated
+                $validated['image'] = 'images/' . $image_name;
+            }
+
+            // Cập nhật thông tin người dùng 
+            $data->update($validated);
+
+            // Trả về JSON response
+            return response()->json([
+                "message" => "Cập nhật người dùng thành công",
+                "data" => $data
+            ], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Lỗi validate
+            return response()->json([
+                "message" => "Dữ liệu không hợp lệ",
+                "errors" => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            // Lỗi khác
+            return response()->json([
+                "message" => "Cập nhật người dùng thất bại",
+                "error" => $e->getMessage()
+            ], 500);
         }
-
-        // Cập nhật thông tin người dùng 
-        $data->update($validated);
-
-        dd($data);
     }
 
     /**
@@ -220,6 +181,35 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        // xóa người dùng
+        try {
+            // Lấy người dùng theo id
+            $data = User::find($id);
+
+            if ($data === null) {
+                return response()->json([
+                    "message" => "Không tìm thấy người dùng",
+                    "data" => []
+                ], 404);
+            }
+
+            // Xóa ảnh đại diện nếu có
+            if (!empty($data->image) && file_exists(public_path($data->image))) {
+                unlink(public_path($data->image));
+            }
+
+            // Xóa người dùng
+            $data->delete();
+
+            return response()->json([
+                "message" => "Xóa người dùng thành công",
+                "data" => $data
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                "message" => "Xóa người dùng thất bại",
+                "error" => $e->getMessage()
+            ], 500);
+        }
     }
 }
